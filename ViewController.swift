@@ -49,6 +49,7 @@ class ViewController: UIViewController {
              //Configure a timer to fetch the motion data.
             timer = Timer(fire: Date(), interval: (1.0/60.0), repeats: true,
                                 block: { (timer) in
+                                    //only runs if colorChosen is false, letting user pick color by tapping
                                     if !self.colorChosen, let data = self.motion.deviceMotion {
                                         // Get the attitude relative to the magnetic north reference frame.
                                         let x = data.attitude.pitch
@@ -56,9 +57,10 @@ class ViewController: UIViewController {
                                         if x < 0.15, x > 0.1 {
                                             self.chooseRandomColor()
                                         }
+                                        //convert yaw to alpha color value between 0-1.0
                                         self.alpha = CGFloat(((z * -1) + 3)/6)
                                         //print("x: " + String(x))
-                                        print("z: " + String(z))
+                                        //print("z: " + String(z))
                                         //print("alpha: " + String(describing: self.alpha))
                                         self.view.backgroundColor = UIColor.init(red: self.red, green: self.green, blue: self.blue, alpha: self.alpha)
                                     }
@@ -70,10 +72,12 @@ class ViewController: UIViewController {
         }
     }
     
+    //lets user choose color by stopping color updates in startDeviceMotion()
     @IBAction func colorChange(_ sender: Any) {
         colorChosen = !colorChosen
     }
     
+    //randomly chooses random doubles for red, blue, green values for a color
     func chooseRandomColor() {
         red = CGFloat(drand48())
         blue = CGFloat(drand48())
