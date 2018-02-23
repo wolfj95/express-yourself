@@ -22,6 +22,7 @@ class ViewController: UIViewController {
     var blue: CGFloat = 0.0
     var green: CGFloat = 0.0
     var alpha: CGFloat = 0.5
+    var colorChosen: Bool = false
     
     //timer
     var timer: Timer!
@@ -47,19 +48,22 @@ class ViewController: UIViewController {
  
              //Configure a timer to fetch the motion data.
             timer = Timer(fire: Date(), interval: (1.0/60.0), repeats: true,
-                               block: { (timer) in
-                                if let data = self.motion.deviceMotion {
-                                    // Get the attitude relative to the magnetic north reference frame.
-                                    let x = data.attitude.pitch
-                                    let z = data.attitude.yaw
-                                    if x < -0 {
-                                        self.chooseRandomColor()
+                                block: { (timer) in
+                                    if !self.colorChosen, let data = self.motion.deviceMotion {
+                                        // Get the attitude relative to the magnetic north reference frame.
+                                        let x = data.attitude.pitch
+                                        let z = data.attitude.yaw
+                                        if x < 0.15, x > 0.1 {
+                                            self.chooseRandomColor()
+                                        }
+                                        self.alpha = CGFloat(((z * -1) + 3)/6)
+                                        //print("x: " + String(x))
+                                        print("z: " + String(z))
+                                        //print("alpha: " + String(describing: self.alpha))
+                                        self.view.backgroundColor = UIColor.init(red: self.red, green: self.green, blue: self.blue, alpha: self.alpha)
                                     }
-                                    self.alpha = CGFloat(((z * -1) + 3)/3.3)
-                                    print("alpha: " + String(describing: self.alpha))
-                                    self.view.backgroundColor = UIColor.init(red: self.red, green: self.green, blue: self.blue, alpha: self.alpha)
                                 }
-            })
+            )
     
             // Add the timer to the current run loop.
             RunLoop.current.add(timer!, forMode: .defaultRunLoopMode)
@@ -67,8 +71,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func colorChange(_ sender: Any) {
-        chooseRandomColor()
-        self.view.backgroundColor = UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
+        colorChosen = !colorChosen
     }
     
     func chooseRandomColor() {
